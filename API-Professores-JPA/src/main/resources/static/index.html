@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filmes</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+        .filme{
+            border-color: red;
+            border: 2px solid;
+        }
+    </style>
+</head>
+<body>
+    <div id="conteudo"></div>
+    <button onClick="testPost()">Test Post</button>
+    <script>
+        function criarCardFilme(filme) {
+            return `<div class="filme">Filme: ${filme.nome} [${filme.nota}]</div>`;
+        }
+        function criarListaFilmes(filmes) {
+            let lista = "";
+            for(var i=0; i<filmes.length; i++) {
+                lista += criarCardFilme(filmes[i]);
+            }
+            return lista;
+        }
+        
+        async function criarFilme(filme) {
+            const resp = await fetch("/api/filmes",{
+                    method: "post",
+                    body: JSON.stringify(filme),
+                    headers: new Headers({'content-type': 'application/json'}),
+                });
+            const novoFilm = await resp.json(resp);
+            document.getElementById("conteudo").innerHTML = criarCardFilme(novoFilm);
+        }
+
+        async function testPost() {
+            criarFilme({
+                nome: "Carros",
+                nota: 5,
+                categoria: "Ação"
+            })
+        }
+
+        window.onload = async () => {
+            const resp = await fetch("/api/filmes");
+            const filmes = await resp.json();
+            let listFilmes = criarListaFilmes(filmes);
+            document.getElementById("conteudo").innerHTML = listFilmes;
+        }
+    </script>
+</body>
+</html>
